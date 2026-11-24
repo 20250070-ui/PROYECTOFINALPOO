@@ -6,7 +6,7 @@ package ComplejoDeportivo;
 
 /**
  *
- * @author MARTIN
+ * @author ZYLIANNE
  */
 public abstract class Comprobante 
 {

@@ -95,9 +95,41 @@ public class GestionEmpleado
         }
     }
     
-    public void modificar()
-    {
-     //falta pq no se   
+    public boolean Modificar(String dni, String nombre, String apellido, String usuario, String contra) {
+        int pos = buscarPosPorDni(dni);
+        if (pos == -1) {
+            return false;
+        }
+
+        int posUsuario = buscarPosPorUsuario(usuario);
+        if (posUsuario != -1 && posUsuario != pos) {
+            return false;
+        }
+
+        Empleado emp = Contratados[pos];
+        emp.setNombre(nombre);
+        emp.setApellido(apellido);
+        emp.setUsuario(usuario);
+        emp.setContra(contra);
+        return true;
+    }
+
+    private int buscarPosPorDni(String dni) {
+        for (int i = 0; i < conta; i++) {
+            if (Contratados[i].getDni().equals(dni)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private int buscarPosPorUsuario(String usuario) {
+        for (int i = 0; i < conta; i++) {
+            if (Contratados[i].getUsuario().equals(usuario)) {
+                return i;
+            }
+        }
+        return -1;
     }
    
     public void BUSCAR(String dni)

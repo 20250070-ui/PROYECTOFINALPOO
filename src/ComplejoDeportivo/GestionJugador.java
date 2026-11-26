@@ -106,6 +106,30 @@ public class GestionJugador
            }
          }
     }
+    
+    public boolean Modificar(String dni, String telefono, String nombre, String apellido, String correo) {
+        int pos = buscarPosPorDni(dni);
+        if (pos == -1) {
+            return false;
+        }
+
+        Jugador jug = Jugadores[pos];
+        jug.setTelefono(telefono);
+        jug.setNombre(nombre);
+        jug.setApellido(apellido);
+        jug.setCorreo(correo);
+        return true;
+    }
+
+    public int buscarPosPorDni(String dni) {
+        for (int i = 0; i < conta; i++) {
+            if (Jugadores[i].getDni().equalsIgnoreCase(dni)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
      public void BUSCAR(String dni)
     {
         

@@ -83,6 +83,17 @@ public class GestionReporte
     public void setContador(int contador) {
         this.contador = contador;
     }
+    public boolean estaDentroDelRango(Comprobante COMPROBANTE, int fechaIni, int fechaFin)
+    {
+    if (COMPROBANTE.getFecha() >= fechaIni)
+    {
+        if (COMPROBANTE.getFecha() <= fechaFin)
+        {
+            return true;
+        }
+    } 
+    return false;
+   }
     
     public int horasReservadas(String codCancha, int fechaIni, int fechaFin)
    {
@@ -123,7 +134,18 @@ public class GestionReporte
     }
    
  
-    
+    public int reservasRegistradas(String dniRecepcionista)
+   {
+    int total = 0;
+    for (int i = 0; i < gReserva.getContador(); i++)
+    {
+        if (gReserva.obtenerreservaPorPosicion(i).getDniRecepcionista().equals(dniRecepcionista))
+        {
+            total++;
+        }
+    }
+    return total;
+   }
     
     public int partidosSupervisados(String dniEncargado)
     {

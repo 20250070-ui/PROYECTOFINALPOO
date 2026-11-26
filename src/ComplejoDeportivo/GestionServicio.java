@@ -88,9 +88,27 @@ public class GestionServicio
          JOptionPane.showMessageDialog(null, "No se encontro registro");
       }
     }
-      public void modificar()
-    {
-     //falta pq no se   
+      
+    public boolean Modificar(String codigo, String nombre, double precioU, int stock) {
+        int pos = buscarPosPorCodigo(codigo);
+        if (pos == -1) {
+            return false;
+        }
+
+        ServiciosAdicionales ser = Servicio[pos];
+        ser.setNombre(nombre);
+        ser.setPrecioU((float) precioU);
+        ser.setStock(stock);
+        return true;
+    }
+
+    public int buscarPosPorCodigo(String codigo) {
+        for (int i = 0; i < conta; i++) {
+            if (Servicio[i].getCodigo().equalsIgnoreCase(codigo)) {
+                return i;
+            }
+        }
+        return -1;
     }
    
       public void BUSCAR(String codigo)

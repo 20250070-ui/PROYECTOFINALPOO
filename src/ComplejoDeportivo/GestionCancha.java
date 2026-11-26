@@ -83,10 +83,28 @@ public class GestionCancha
         }
     }
     
-    public void modificar()
-    {
-        //falta pq no se
+    public boolean Modificar(String codigo, String nombre, double tarifaB, String estado) {
+        int pos = buscarPosPorCodigo(codigo);
+        if (pos == -1) {
+            return false;
+        }
+
+        Cancha can = Canchas[pos];
+        can.setNombre(nombre);
+        can.setTarifaB(tarifaB);
+        can.setEstado(estado);
+        return true;
     }
+
+    public int buscarPosPorCodigo(String codigo) {
+        for (int i = 0; i < conta; i++) {
+            if (Canchas[i].getCodigo().equalsIgnoreCase(codigo)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
     public void BUSCAR(String codigo)
     {
         

@@ -190,8 +190,172 @@ public class GestionReporte
          }
      }
     }
+      
     
    }
+    public int totalHorasReservadas(int fechaIni, int fechaFin)
+    {
+        int total = 0;
+        for (int i = 0; i < gCancha.getConta(); i++)
+        {
+            Cancha CANCHA = gCancha.get(i);
+            if (CANCHA.getEstado().equalsIgnoreCase("Eliminado") == false)
+            {
+                total += horasReservadas(CANCHA.getCodigo(), fechaIni, fechaFin);
+            }
+        }
+        return total;
+    }
+
+    public int totalHorasDisponibles(int fechaIni, int fechaFin)
+    {
+        int total = 0;
+        for (int i = 0; i < gCancha.getConta(); i++)
+        {
+            if (gCancha.get(i).getEstado().equalsIgnoreCase("Eliminado") == false)
+            {
+                total += horasDisponibles(fechaIni, fechaFin);
+            }
+        }
+        return total;
+    }
+
+    public int totalReservasRegistradas()
+    {
+        int total = 0;
+        for (int i = 0; i < gEmpleado.getConta(); i++)
+        {
+            Empleado EMPLEADO = gEmpleado.get(i);
+            if (EMPLEADO.getNombre().equalsIgnoreCase("Eliminado") == false)
+            {
+                if (EMPLEADO.rol().equalsIgnoreCase("Administrador") == false)
+                {
+                    total += reservasRegistradas(EMPLEADO.getDni());
+                }
+            }
+        }
+        return total;
+    }
+
+    public int totalPartidosSupervisados()
+    {
+        int total = 0;
+        for (int i = 0; i < gEmpleado.getConta(); i++)
+        {
+            Empleado EMPLEADO = gEmpleado.get(i);
+            if (EMPLEADO.getNombre().equalsIgnoreCase("Eliminado") == false)
+            {
+                if (EMPLEADO.rol().equalsIgnoreCase("Administrador") == false)
+                {
+                    total += partidosSupervisados(EMPLEADO.getDni());
+                }
+            }
+        }
+        return total;
+    }
+    public int totalReservasFinalizadas()
+    {
+        int total = 0;
+        for (int i = 0; i < contador; i++)
+        {
+            total += arreglo[i].getReservas();
+        }
+        return total;
+    }
+    public double totalAlquiler(int fechaIni, int fechaFin)
+    {
+        double total = 0;
+        for (int i = 0; i < gComprobante.getContador(); i++)
+        {
+            Comprobante COMPROBANTE = gComprobante.obtenerComprobantePorPosicion(i);
+            if (estaDentroDelRango(COMPROBANTE, fechaIni, fechaFin))
+            {
+                total += COMPROBANTE.getAlquiler() - COMPROBANTE.getDescuento();
+            }
+        }
+        return total;
+    }
+    public double totalServicios(int fechaIni, int fechaFin)
+    {
+        double total = 0;
+        for (int i = 0; i < gComprobante.getContador(); i++)
+        {
+            Comprobante COMPROBANTE = gComprobante.obtenerComprobantePorPosicion(i);
+            if (estaDentroDelRango(COMPROBANTE, fechaIni, fechaFin))
+            {
+                total += COMPROBANTE.getServicios();
+            }
+        }
+        return total;
+    }
+    public double totalPaquetes(int fechaIni, int fechaFin)
+    {
+        double total = 0;
+        for (int i = 0; i < gComprobante.getContador(); i++)
+        {
+            Comprobante COMPROBANTE = gComprobante.obtenerComprobantePorPosicion(i);
+            if (estaDentroDelRango(COMPROBANTE, fechaIni, fechaFin))
+            {
+                total += COMPROBANTE.getPaquetes();
+            }
+        }
+        return total;
+    }
+
+    public double totalIncidencias(int fechaIni, int fechaFin)
+    {
+        double total = 0;
+        for (int i = 0; i < gComprobante.getContador(); i++)
+        {
+            Comprobante COMPROBANTE = gComprobante.obtenerComprobantePorPosicion(i);
+            if (estaDentroDelRango(COMPROBANTE, fechaIni, fechaFin))
+            {
+                total += COMPROBANTE.getIncidencias();
+            }
+        }
+        return total;
+    }
+
+    public double totalSubtotal(int fechaIni, int fechaFin)
+    {
+        double total = 0;
+        for (int i = 0; i < gComprobante.getContador(); i++)
+        {
+            Comprobante COMPROBANTE = gComprobante.obtenerComprobantePorPosicion(i);
+            if (estaDentroDelRango(COMPROBANTE, fechaIni, fechaFin))
+            {
+                total += COMPROBANTE.subtotal();
+            }
+        }
+        return total;
+    }
+
+    public double totalIGV(int fechaIni, int fechaFin)
+    {
+        double total = 0;
+        for (int i = 0; i < gComprobante.getContador(); i++)
+        {
+            Comprobante COMPROBANTE = gComprobante.obtenerComprobantePorPosicion(i);
+            if (estaDentroDelRango(COMPROBANTE, fechaIni, fechaFin))
+            {
+                total += COMPROBANTE.IGV();
+            }
+        }
+        return total;
+    }
+    public double totalGeneral(int fechaIni, int fechaFin)
+    {
+        double total = 0;
+        for (int i = 0; i < gComprobante.getContador(); i++)
+        {
+            Comprobante COMPROBANTE = gComprobante.obtenerComprobantePorPosicion(i);
+            if (estaDentroDelRango(COMPROBANTE, fechaIni, fechaFin))
+            {
+                total += COMPROBANTE.total();
+            }
+        }
+        return total;
+    }
   
   
     

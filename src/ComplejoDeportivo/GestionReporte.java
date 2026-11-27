@@ -83,10 +83,17 @@ public class GestionReporte
     public void setContador(int contador) {
         this.contador = contador;
     }
-    public String[] columnasOcupacion()
+    public boolean estaDentroDelRango(Comprobante COMPROBANTE, int fechaIni, int fechaFin)
     {
-        return new String[]{"Codigo", "Cancha", "Tipo", "Horas reservadas", "Horas disponibles", "% Ocupacion"};
-    }
+    if (COMPROBANTE.getFecha() >= fechaIni)
+    {
+        if (COMPROBANTE.getFecha() <= fechaFin)
+        {
+            return true;
+        }
+    } 
+    return false;
+   }
     
     public int horasReservadas(String codCancha, int fechaIni, int fechaFin)
    {
@@ -125,64 +132,20 @@ public class GestionReporte
         }
         return reservadas * 100.0 / disponibles;
     }
-   public String[] filaOcupacion(int i, int fechaIni, int fechaFin)
-  {
-    Cancha CANCHA = gCancha.get(i);
-    if (CANCHA.getEstado().equalsIgnoreCase("Eliminado"))
-    {
-        return null;
-    }
-    int reservadas = horasReservadas(CANCHA.getCodigo(), fechaIni, fechaFin);
-    int disponibles = horasDisponibles(fechaIni, fechaFin);
-
-    String[] datos = new String[6];
-    datos[0] = CANCHA.getCodigo();
-    datos[1] = CANCHA.getNombre();
-    datos[2] = CANCHA.tipo();
-    datos[3] = "" + reservadas;
-    datos[4] = "" + disponibles;
-    datos[5] = "" + porcentajeOcupacion(reservadas, disponibles) + " %";
-    return datos;
-   }
-   public String[] filaTotalOcupacion(int fechaIni, int fechaFin)
-  {
-    int reservadas = 0;
-    int disponibles = 0;
-    for (int i = 0; i < gCancha.getConta(); i++)
-    {
-        Cancha CANCHA = gCancha.get(i);
-        if (CANCHA.getEstado().equalsIgnoreCase("Eliminado") == false)
-        {
-            reservadas += horasReservadas(CANCHA.getCodigo(), fechaIni, fechaFin);
-            disponibles += horasDisponibles(fechaIni, fechaFin);
-        }
-    }
-    String[] datos = new String[6];
-    datos[0] = "TOTAL";
-    datos[1] = "";
-    datos[2] = "";
-    datos[3] = "" + reservadas;
-    datos[4] = "" + disponibles;
-    datos[5] = "" + porcentajeOcupacion(reservadas, disponibles) + " %";
-    return datos;
-  }
-    public String[] columnasProductividad()
-    {
-        return new String[]{"DNI", "Empleado", "Rol", "Reservas registradas", "Partidos supervisados"};
-    }
-    
+   
+ 
     public int reservasRegistradas(String dniRecepcionista)
+   {
+    int total = 0;
+    for (int i = 0; i < gReserva.getContador(); i++)
     {
-        int total = 0;
-        for (int i = 0; i < gReserva.getContador(); i++)
+        if (gReserva.obtenerreservaPorPosicion(i).getDniRecepcionista().equals(dniRecepcionista))
         {
-            if (gReserva.obtenerreservaPorPosicion(i).getDniRecepcionista().equals(dniRecepcionista))
-            {
-                total++;
-            }
+            total++;
         }
-        return total;
     }
+    return total;
+   }
     
     public int partidosSupervisados(String dniEncargado)
     {
@@ -196,50 +159,9 @@ public class GestionReporte
         }
         return total;
     }
-   public String[] filaProductividad(int i)
-  {
-    Empleado EMPLEADO = gEmpleado.get(i);
-    if (EMPLEADO.getNombre().equalsIgnoreCase("Eliminado") || EMPLEADO.rol().equalsIgnoreCase("Administrador"))
-    {
-        return null;
-    }
-    String[] datos = new String[5];
-    datos[0] = EMPLEADO.getDni();
-    datos[1] = EMPLEADO.getNombre() + " " + EMPLEADO.getApellido();
-    datos[2] = EMPLEADO.rol();
-    datos[3] = "" + reservasRegistradas(EMPLEADO.getDni());
-    datos[4] = "" + partidosSupervisados(EMPLEADO.getDni());
-    return datos;
-  }
-   public String[] filaTotalProductividad()
-   {
-    int registradas = 0;
-    int supervisados = 0;
-    for (int i = 0; i < gEmpleado.getConta(); i++)
-    {
-        Empleado EMPLEADO = gEmpleado.get(i);
-        if (EMPLEADO.getNombre().equalsIgnoreCase("Eliminado") == false)
-        {
-            if (EMPLEADO.rol().equalsIgnoreCase("Administrador") == false)
-            {
-                registradas += reservasRegistradas(EMPLEADO.getDni());
-                supervisados += partidosSupervisados(EMPLEADO.getDni());
-            }
-        }
-    }
-    String[] datos = new String[5];
-    datos[0] = "TOTAL";
-    datos[1] = "";
-    datos[2] = "";
-    datos[3] = "" + registradas;
-    datos[4] = "" + supervisados;
-    return datos;
-   }
+  
+  
    
-   public String[] columnasTopJugadores()
-    {
-        return new String[]{"Puesto", "DNI", "Jugador", "Tipo", "Reservas finalizadas"};
-    }
    public void Ordenar()
   {
       arreglo = new Jugador[gJugador.getConta()];
@@ -268,105 +190,178 @@ public class GestionReporte
          }
      }
     }
+      
     
    }
-   public String[] filaTopJugadores(int i)
+    public int totalHorasReservadas(int fechaIni, int fechaFin)
     {
-        String[] datos = new String[5];
-        datos[0] = "" + (i + 1);
-        datos[1] = arreglo[i].getDni();
-        datos[2] = arreglo[i].getNombre() + " " + arreglo[i].getApellido();
-        datos[3] = arreglo[i].getTipo();
-        datos[4] = "" + arreglo[i].getReservas();
-        return datos;
+        int total = 0;
+        for (int i = 0; i < gCancha.getConta(); i++)
+        {
+            Cancha CANCHA = gCancha.get(i);
+            if (CANCHA.getEstado().equalsIgnoreCase("Eliminado") == false)
+            {
+                total += horasReservadas(CANCHA.getCodigo(), fechaIni, fechaFin);
+            }
+        }
+        return total;
     }
-   public String[] filaTotalTopJugadores()
+
+    public int totalHorasDisponibles(int fechaIni, int fechaFin)
+    {
+        int total = 0;
+        for (int i = 0; i < gCancha.getConta(); i++)
+        {
+            if (gCancha.get(i).getEstado().equalsIgnoreCase("Eliminado") == false)
+            {
+                total += horasDisponibles(fechaIni, fechaFin);
+            }
+        }
+        return total;
+    }
+
+    public int totalReservasRegistradas()
+    {
+        int total = 0;
+        for (int i = 0; i < gEmpleado.getConta(); i++)
+        {
+            Empleado EMPLEADO = gEmpleado.get(i);
+            if (EMPLEADO.getNombre().equalsIgnoreCase("Eliminado") == false)
+            {
+                if (EMPLEADO.rol().equalsIgnoreCase("Administrador") == false)
+                {
+                    total += reservasRegistradas(EMPLEADO.getDni());
+                }
+            }
+        }
+        return total;
+    }
+
+    public int totalPartidosSupervisados()
+    {
+        int total = 0;
+        for (int i = 0; i < gEmpleado.getConta(); i++)
+        {
+            Empleado EMPLEADO = gEmpleado.get(i);
+            if (EMPLEADO.getNombre().equalsIgnoreCase("Eliminado") == false)
+            {
+                if (EMPLEADO.rol().equalsIgnoreCase("Administrador") == false)
+                {
+                    total += partidosSupervisados(EMPLEADO.getDni());
+                }
+            }
+        }
+        return total;
+    }
+    public int totalReservasFinalizadas()
     {
         int total = 0;
         for (int i = 0; i < contador; i++)
         {
             total += arreglo[i].getReservas();
         }
-        String[] datos = new String[5];
-        datos[0] = "TOTAL";
-        datos[1] = "";
-        datos[2] = "";
-        datos[3] = "";
-        datos[4] = "" + total;
-        return datos;
+        return total;
     }
-    public String[] columnasIngresos()
+    public double totalAlquiler(int fechaIni, int fechaFin)
     {
-        return new String[]{"N° Comprobante", "Tipo", "Fecha", "Alquiler (S/)", "Servicios (S/)","Paquetes (S/)", "Incidencias (S/)", "Subtotal (S/)", "IGV (S/)", "Total (S/)"};
-    }
-    private boolean estaDentroDelRango(Comprobante COMPROBANTE, int fechaIni, int fechaFin)
-    {
-     if (COMPROBANTE.getFecha() >= fechaIni)
-     {
-         if (COMPROBANTE.getFecha() <= fechaFin)
-         {
-            return true;
-         }
-     } 
-     return false;
-   }
-    public String[] filaIngresos(int i, int fechaIni, int fechaFin)
-    {
-    Comprobante COMPROBANTE = gComprobante.obtenerComprobantePorPosicion(i);
-    if (estaDentroDelRango(COMPROBANTE, fechaIni, fechaFin) == false)
-    {
-        return null;
-    }
-    String[] datos = new String[10];
-    datos[0] = "" + COMPROBANTE.getNumero();
-    datos[1] = COMPROBANTE.tipo();
-    datos[2] = Fecha.mostrar(COMPROBANTE.getFecha());
-    datos[3] = "" + (COMPROBANTE.getAlquiler() - COMPROBANTE.getDescuento());
-    datos[4] = "" + COMPROBANTE.getServicios();
-    datos[5] = "" + COMPROBANTE.getPaquetes();
-    datos[6] = "" + COMPROBANTE.getIncidencias();
-    datos[7] = "" + COMPROBANTE.subtotal();
-    datos[8] = "" + COMPROBANTE.IGV();
-    datos[9] = "" + COMPROBANTE.total();
-    return datos;
-    }
-    
-    public String[] filaTotalIngresos(int fechaIni, int fechaFin)
-    {
-    double alquiler = 0;
-    double servicios = 0;
-    double paquetes = 0;
-    double incidencias = 0;
-    double subtotal = 0;
-    double igv = 0;
-    double total = 0;
-    for (int i = 0; i < gComprobante.getContador(); i++)
-    {
-        Comprobante COMPROBANTE = gComprobante.obtenerComprobantePorPosicion(i);
-        if (estaDentroDelRango(COMPROBANTE, fechaIni, fechaFin))
+        double total = 0;
+        for (int i = 0; i < gComprobante.getContador(); i++)
         {
-            alquiler += COMPROBANTE.getAlquiler() - COMPROBANTE.getDescuento();
-            servicios += COMPROBANTE.getServicios();
-            paquetes += COMPROBANTE.getPaquetes();
-            incidencias += COMPROBANTE.getIncidencias();
-            subtotal += COMPROBANTE.subtotal();
-            igv += COMPROBANTE.IGV();
-            total += COMPROBANTE.total();
+            Comprobante COMPROBANTE = gComprobante.obtenerComprobantePorPosicion(i);
+            if (estaDentroDelRango(COMPROBANTE, fechaIni, fechaFin))
+            {
+                total += COMPROBANTE.getAlquiler() - COMPROBANTE.getDescuento();
+            }
         }
+        return total;
     }
-    String[] datos = new String[10];
-    datos[0] = "TOTAL";
-    datos[1] = "";
-    datos[2] = "";
-    datos[3] = "" + alquiler;
-    datos[4] = "" + servicios;
-    datos[5] = "" + paquetes;
-    datos[6] = "" + incidencias;
-    datos[7] = "" + subtotal;
-    datos[8] = "" + igv;
-    datos[9] = "" + total;
-    return datos;
+    public double totalServicios(int fechaIni, int fechaFin)
+    {
+        double total = 0;
+        for (int i = 0; i < gComprobante.getContador(); i++)
+        {
+            Comprobante COMPROBANTE = gComprobante.obtenerComprobantePorPosicion(i);
+            if (estaDentroDelRango(COMPROBANTE, fechaIni, fechaFin))
+            {
+                total += COMPROBANTE.getServicios();
+            }
+        }
+        return total;
     }
+    public double totalPaquetes(int fechaIni, int fechaFin)
+    {
+        double total = 0;
+        for (int i = 0; i < gComprobante.getContador(); i++)
+        {
+            Comprobante COMPROBANTE = gComprobante.obtenerComprobantePorPosicion(i);
+            if (estaDentroDelRango(COMPROBANTE, fechaIni, fechaFin))
+            {
+                total += COMPROBANTE.getPaquetes();
+            }
+        }
+        return total;
+    }
+
+    public double totalIncidencias(int fechaIni, int fechaFin)
+    {
+        double total = 0;
+        for (int i = 0; i < gComprobante.getContador(); i++)
+        {
+            Comprobante COMPROBANTE = gComprobante.obtenerComprobantePorPosicion(i);
+            if (estaDentroDelRango(COMPROBANTE, fechaIni, fechaFin))
+            {
+                total += COMPROBANTE.getIncidencias();
+            }
+        }
+        return total;
+    }
+
+    public double totalSubtotal(int fechaIni, int fechaFin)
+    {
+        double total = 0;
+        for (int i = 0; i < gComprobante.getContador(); i++)
+        {
+            Comprobante COMPROBANTE = gComprobante.obtenerComprobantePorPosicion(i);
+            if (estaDentroDelRango(COMPROBANTE, fechaIni, fechaFin))
+            {
+                total += COMPROBANTE.subtotal();
+            }
+        }
+        return total;
+    }
+
+    public double totalIGV(int fechaIni, int fechaFin)
+    {
+        double total = 0;
+        for (int i = 0; i < gComprobante.getContador(); i++)
+        {
+            Comprobante COMPROBANTE = gComprobante.obtenerComprobantePorPosicion(i);
+            if (estaDentroDelRango(COMPROBANTE, fechaIni, fechaFin))
+            {
+                total += COMPROBANTE.IGV();
+            }
+        }
+        return total;
+    }
+    public double totalGeneral(int fechaIni, int fechaFin)
+    {
+        double total = 0;
+        for (int i = 0; i < gComprobante.getContador(); i++)
+        {
+            Comprobante COMPROBANTE = gComprobante.obtenerComprobantePorPosicion(i);
+            if (estaDentroDelRango(COMPROBANTE, fechaIni, fechaFin))
+            {
+                total += COMPROBANTE.total();
+            }
+        }
+        return total;
+    }
+  
+  
+    
+    
+    
+    
 
 
     
